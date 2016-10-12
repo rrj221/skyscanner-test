@@ -48,64 +48,67 @@ router.get('/sky', function(req, res) {
 					var it0 = itineraries[0];
 
 					//outbound
-					var outboundInfo = {};
-
 					var outboundId = it0.OutboundLegId;
-					var originStation = '';
 
-					for (leg of legs) {
-						if (leg.Id === outboundId) {
-							console.log(outboundId, leg.Id);
-							console.log(leg);
+					function getLegInfo(id) {
+						for (leg of legs) {
+							if (leg.Id === id) {
+								console.log(id, leg.Id);
+								console.log(leg);
 
-							var originStationId = leg.OriginStation;
-							var originStationName = '';
-							places.forEach(function (place, i) {
-								if (place.Id === originStationId) {
-									originStationName = place.Name; 
-								}
-							});
-
-							var destinationStationId = leg.DestinationStation;
-							var desitinationStationName = '';
-							places.forEach(function (place, i) {
-								if (place.Id === destinationStationId) {
-									destinationStationName = place.Name; 
-								}
-							});
-
-							var departure = leg.Departure;
-							var arrival = leg.Arrival;
-							var stopsQty = leg.Stops.length;
-							var duration = leg.Duration;
-							var journeyMode = leg.JourneyMode;
-
-							var carrierIds = leg.Carriers;
-							var carrierNames = [];
-							carrierIds.forEach(function(carrierId, i) {
-								carriers.forEach(function(carrier, i) {
-									if (carrier.Id === carrierId) {
-										var carrierStuff = {
-											name: carrier.Name,
-											url: carrier.ImageUrl
-										}
-										carrierNames.push(carrierStuff);
+								var originStationId = leg.OriginStation;
+								var originStationName = '';
+								places.forEach(function (place, i) {
+									if (place.Id === originStationId) {
+										originStationName = place.Name; 
 									}
 								});
-							});
+
+								var destinationStationId = leg.DestinationStation;
+								var desitinationStationName = '';
+								places.forEach(function (place, i) {
+									if (place.Id === destinationStationId) {
+										destinationStationName = place.Name; 
+									}
+								});
+
+								var departure = leg.Departure;
+								var arrival = leg.Arrival;
+								var stopsQty = leg.Stops.length;
+								var duration = leg.Duration;
+								var journeyMode = leg.JourneyMode;
+
+								var carrierIds = leg.Carriers;
+								var carrierNames = [];
+								carrierIds.forEach(function(carrierId, i) {
+									carriers.forEach(function(carrier, i) {
+										if (carrier.Id === carrierId) {
+											var carrierStuff = {
+												name: carrier.Name,
+												url: carrier.ImageUrl
+											}
+											carrierNames.push(carrierStuff);
+										}
+									});
+								});
+							}
 						}
+
+						var legInfo = {
+							originStation: originStationName,
+							destinationStation: destinationStationName,
+							departure: departure,
+							arrival: arrival,
+							stopsQty: stopsQty,
+							duration: duration,
+							journeyMode: journeyMode,
+							carrierNames: carrierNames
+						}
+
+						return legInfo
+
 					}
 
-					outboundInfo = {
-						originStation: originStationName,
-						destinationStation: destinationStationName,
-						departure: departure,
-						arrival: arrival,
-						stopsQty: stopsQty,
-						duration: duration,
-						journeyMode: journeyMode,
-						carrierNames: carrierNames
-					}
 
 
 
@@ -125,8 +128,8 @@ router.get('/sky', function(req, res) {
 
 
 
-					// res.json(outboundInfo);
-					res.json({stuff: stuffs});
+					res.json(getLegInfo(outboundId));
+					// res.json({stuff: stuffs});
 				})
 			}, 2000)
 		});
